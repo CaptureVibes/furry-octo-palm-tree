@@ -1,0 +1,52 @@
+Shader "Custom/Fixed_2"
+{
+    properties
+    {
+        _Color("Main Color",color)=(1,1,1,1)
+        _Ambient("Ambient",color)=(0.3,0.3,0.3,1) 
+        _Specular("Specular",color)=(1,1,1,1)
+        _Shininess("Shininess",range(0,8))=4
+        _Emission("Emission",color)=(1,1,1,1)
+        _MainTex("Maintexture",2d)=" "{}
+        _SecondTex("Sectexture",2d)=" "{}
+        _Constant("ConstantColor",color)=(1,1,1,0.3)// or去掉花括号 放到tex语句前面
+    }
+    SubShader
+    {
+       Tags { "Queue" = "Transparent" }
+      
+       pass
+       {
+        //color(1,0,0,1)
+       // color[_Color]
+
+        //SrcAlpha	GPU 将此输入的值乘以源 Alpha 值。
+        //OneMinusSrcAlpha	GPU 将此输入的值乘以（1 - 源 Alpha）。
+
+       Blend SrcAlpha OneMinusSrcAlpha // 传统透明度
+
+
+       material
+       {
+            diffuse[_Color]
+            ambient[_Ambient]
+            specular[_Specular]
+            shininess[_Shininess]
+            emission[_Emission]
+       }
+       Lighting on
+       separatespecular on
+
+       settexture[_MainTex] // 只能添加一个参数
+       {
+            combine texture * primary double  // only the texure   小于1的数相乘会变得更小， 颜色会变深 quad
+       }
+       settexture[_SecondTex]
+       {
+            constantColor[_Constant]
+            combine texture * previous  double , texture*constant // primary 代表的是顶点光照的颜色，即 material 部分
+       }
+       //matrix 
+       }
+    }
+}
